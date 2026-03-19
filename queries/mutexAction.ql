@@ -15,10 +15,16 @@ predicate isUnlocked(Call call, Expr mutex) {
   // RAII: lock_guard destructor
     (call instanceof DestructorCall and
     call.getTarget().getDeclaringType().getName().matches("%lock_guard%") and
-    mutex = call.getQualifier()) or 
+    mutex = (call.getQualifier())) or 
     (call.getTarget() instanceof MemberFunction and
     call.getTarget().getName() = "unlock" and
     mutex = call.getQualifier())
+}
+
+predicate newUnlock(Call call, Expr mutex) {
+    exists(ConstructorCall ctor, LocalVariable v | 
+        call = ctor and
+        v.getInitializer() = ctor
 }
 
 /**
