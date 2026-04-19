@@ -8,9 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(include)
 
 add_executable(MyProject
-    src/main.cpp
-    src/utils.cpp
-    src/math.cpp
+    start.cpp
+    FileWithoutClass.cpp
+    conflictingWithMutex.cpp
 )
 
 # ---------------------------------------------

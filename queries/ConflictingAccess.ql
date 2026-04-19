@@ -16,8 +16,8 @@ predicate hasMutexOrAtomic(File f) {
   exists(Include inc |
     inc.getFile() = f and
     (
-      inc.getTarget().getName() = "mutex" or
-      inc.getTarget().getName() = "atomic"
+       inc.getIncludedFile().getBaseName() = "mutex" or
+      inc.getIncludedFile().getBaseName() = "atomic"
     )
   )
 }
@@ -26,11 +26,11 @@ predicate unprotectedFieldRace(Field f, FieldAccess a1, FieldAccess a2) {
   inProjectFile(a1) and
   inProjectFile(a2) and
 
-  a1.getField() = f and
-  a2.getField() = f and
+  a1.getTarget() = f and
+  a2.getTarget() = f and
   a1 != a2 and
 
-  (a1.isWrite() or a2.isWrite()) and
+  (a1.isModified() or a2.isModified()) and
 
   not bothProtectedBySameMutex(a1, a2)
 }
@@ -38,8 +38,8 @@ predicate unprotectedFieldRace(Field f, FieldAccess a1, FieldAccess a2) {
 from File f, Field field, FieldAccess fa1, FieldAccess fa2
 where
   hasMutexOrAtomic(f) and
-  hasClass(f) and
+  hasClass(f)
 
-  field.getFile() = f and
-  unprotectedFieldRace(field, fa1, fa2)
-select f, fa1, fa2, "This file contains a potential data race"
+  //field.getFile() = f and 
+  //unprotectedFieldRace(f, a1, a2)
+select f, "this file includes mutex or atomic and has a class"

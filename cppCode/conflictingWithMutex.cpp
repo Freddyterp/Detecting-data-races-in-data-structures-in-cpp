@@ -1,6 +1,7 @@
 #include <mutex>
 
-class Data {
+class Data 
+{
     private:
         int value;
         std::mutex mtx;
