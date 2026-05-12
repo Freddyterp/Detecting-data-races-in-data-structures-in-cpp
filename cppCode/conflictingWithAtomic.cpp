@@ -1,10 +1,10 @@
-#include <mutex>
+#include <atomic>
 
-class DataWithoutMutex 
+
+class DataAtomic
 {
     private:
-        int value;
-        std::mutex mtx;
+        std::atomic<int> value;
 
     public:
 
@@ -13,7 +13,6 @@ class DataWithoutMutex
         }
 
         int getValue() {
-            int val = value;
-            return val;
+            return value;
         }
 };

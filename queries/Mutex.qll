@@ -5,31 +5,31 @@ import cpp
 import semmle.code.cpp.controlflow.ControlFlowGraph
 import semmle.code.cpp.controlflow.Dominance
 
-predicate isLocked(Call call, Variable mutex) {
-    ( exists (VariableAccess va |
+predicate isLocked(Call call, Field mutex) {
+    ( exists (FieldAccess fa |
       call instanceof ConstructorCall and
       call.getTarget().getDeclaringType().getName().matches("%lock_guard%") and
-      va = call.getQualifier() and
-      mutex = va.getTarget() and
+      fa = call.getArgument(0) and
+      mutex = fa.getTarget() and
       mutex.getType().hasName("mutex")
     )) or
 
     // Direct mutex.lock() method call
-    ( exists(VariableAccess va |
+    ( exists(FieldAccess fa |
       call.getTarget() instanceof MemberFunction and
       call.getTarget().getName() = "lock" and
-      va = call.getQualifier() and
-      mutex = va.getTarget() and
+      fa = call.getQualifier() and
+      mutex = fa.getTarget() and
       mutex.getType().hasName("mutex")
     ))
 }
 
-predicate isUnlocked(Call call, Variable mutex) {
+predicate isUnlocked(Call call, Field mutex) {
   // RAII: lock_guard destructor
     (call instanceof DestructorCall and
     call.getTarget().getDeclaringType().getName().matches("%lock_guard%") and
     unlockMutex(call, mutex)) or
-    (exists(VariableAccess va |
+    (exists(FieldAccess va |
       call.getTarget() instanceof MemberFunction and
       call.getTarget().getName() = "unlock" and
       va = call.getQualifier() and
@@ -39,8 +39,8 @@ predicate isUnlocked(Call call, Variable mutex) {
 }
 
 
-predicate unlockMutex(DestructorCall dtor, Variable mutex) {
-  exists(Variable v, Initializer init, ConstructorCall ctor, VariableAccess arg |
+predicate unlockMutex(DestructorCall dtor, Field mutex) {
+  exists(Variable v, Initializer init, ConstructorCall ctor, FieldAccess arg |
     v.getAnAccess() = dtor.getQualifier() and
     init = v.getInitializer() and
     ctor = init.getExpr().(ConstructorCall) and
@@ -49,19 +49,24 @@ predicate unlockMutex(DestructorCall dtor, Variable mutex) {
   )
 }
 
-predicate isProtectedBy(Expr access, Variable mutexVar) {
+predicate isProtectedBy(FieldAccess access, Field mutex) {
   exists(Call lockCall, Call unlockCall |
-    isLocked(lockCall, mutexVar) and
-    isUnlocked(unlockCall, mutexVar) and
+    isLocked(lockCall, mutex) and
+    isUnlocked(unlockCall, mutex) and
+    
     lockCall.getEnclosingFunction() = access.getEnclosingFunction() and
+    unlockCall.getEnclosingFunction() = access.getEnclosingFunction() and
+
     lockCall.getLocation().getStartLine() < access.getLocation().getStartLine() and
-    access.getLocation().getStartLine() < unlockCall.getLocation().getStartLine()
+    access.getLocation().getStartLine() < unlockCall.getLocation().getStartLine() and
+
+    lockCall.getLocation().getStartLine() < unlockCall.getLocation().getStartLine()
   )
 }
 
-predicate bothProtectedBySameMutex(Expr a1, Expr a2) {
-  exists(Variable mutexVar | 
-    isProtectedBy(a1, mutexVar) and
-    isProtectedBy(a2, mutexVar)
+predicate bothProtectedBySameMutex(FieldAccess a1, FieldAccess a2) {
+  exists(Field mutex |
+    isProtectedBy(a1, mutex) and
+    isProtectedBy(a2, mutex)
   )
 }

@@ -1,6 +1,6 @@
 #include <mutex>
 
-class DataMutex
+class DataLock
 {
     private:
         int value;
@@ -9,15 +9,13 @@ class DataMutex
     public:
 
         void setValue(int newValue) {
-            mtx.lock();
+            std::lock_guard<std::mutex> guard(mtx);
             value = newValue;
-            mtx.unlock();
         }
 
         int getValue() {
-            mtx.lock();
+            std::lock_guard<std::mutex> guard(mtx);
             int val = value;
-            mtx.unlock();
             return val;
         }
 };

@@ -11,6 +11,12 @@ add_executable(MyProject
     start.cpp
     FileWithoutClass.cpp
     conflictingWithMutex.cpp
+    conflictingWithOneMutex.cpp
+    conflictingWithoutMutex.cpp
+    conflictingWithOneLock.cpp
+    conflictingWithLock.cpp
+    conflictingWithAtomic.cpp
+    invariant.cpp
 )
 
 # ---------------------------------------------
