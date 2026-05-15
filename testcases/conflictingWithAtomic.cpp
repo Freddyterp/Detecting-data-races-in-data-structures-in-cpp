@@ -9,10 +9,10 @@ class DataAtomic
     public:
 
         void setValue(int newValue) {
-            value = newValue;
+            value = newValue; // atomic assignment
         }
 
         int getValue() {
-            return value;
+            return value; // atomic read
         }
 };

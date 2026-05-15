@@ -8,8 +8,6 @@ import Heuristic
 // Predicate to restrict analysis to project files
 
 predicate unprotectedFieldRace(Field f, FieldAccess a1, FieldAccess a2) {
-  //inProjectFile(a1) and
-  //inProjectFile(a2) and
 
   conflictingAccess(f, a1, a2) and
 
@@ -19,8 +17,8 @@ predicate unprotectedFieldRace(Field f, FieldAccess a1, FieldAccess a2) {
 
 from Type t, Field field, FieldAccess fa1, FieldAccess fa2
 where
-  inProjectFile(fa1) and
-  inProjectFile(fa2) and
+  //inProjectFile(fa1) and
+  //inProjectFile(fa2) and
 
   hasMutexOrAtomic(t) and
   

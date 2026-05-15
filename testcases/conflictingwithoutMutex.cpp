@@ -1,6 +1,6 @@
 #include <mutex>
 
-class DataOneLock
+class DataWithoutMutex 
 {
     private:
         int value;
@@ -9,12 +9,11 @@ class DataOneLock
     public:
 
         void setValue(int newValue) {
-            std::lock_guard<std::mutex> guard(mtx);
-            value = newValue;
+            value = newValue; // unprotected access
         }
 
         int getValue() {
-            int val = value;
+            int val = value; // unprotected access
             return val;
         }
 };
